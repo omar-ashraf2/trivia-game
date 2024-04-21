@@ -23,8 +23,6 @@
   font-family: "DecimaMonoPro", Inter, system-ui, Avenir, Helvetica, Arial,
     sans-serif;
 
-  background-color: #242424;
-  color: #fff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -43,11 +41,16 @@ button {
   all: unset;
   cursor: pointer;
 }
-
+a,
+button,
+input {
+  font-family: "DecimaMonoPro", sans-serif;
+}
 body {
   font-family: "DecimaMonoPro", sans-serif;
   display: flex;
   place-items: center;
+  justify-content: center;
   min-width: 320px;
   min-height: 100vh;
 }

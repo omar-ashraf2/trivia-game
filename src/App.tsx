@@ -1,15 +1,15 @@
-import styled from "styled-components";
-
-const Button = styled.button`
-  background-color: #444;
-  padding: 20px 25px;
-`;
+import Footer from "./components/Footer";
+import WelcomeScreen from "./components/WelcomeScreen";
+import { footerItemsWelcomeScreen } from "./constants/footerItems";
 
 function App() {
   return (
-    <div>
-      <Button>Hello World</Button>
-    </div>
+    <>
+      <main>
+        <WelcomeScreen />
+      </main>
+      <Footer items={footerItemsWelcomeScreen} />
+    </>
   );
 }
 
