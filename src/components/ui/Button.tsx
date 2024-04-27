@@ -24,11 +24,10 @@ const ButtonStyles = styled.button<ButtonStylesProps>`
 
   &:hover {
     background-color: #b6b6b692;
-    transform: translateY(-2px);
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: translateY(3px);
   }
 `;
 

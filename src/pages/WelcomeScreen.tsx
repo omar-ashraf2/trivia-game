@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Button from "./ui/Button";
+import Button from "../components/ui/Button";
 
 const WelcomeScreenContainer = styled.section`
   display: flex;
