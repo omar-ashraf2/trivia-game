@@ -1,13 +1,8 @@
 import { ButtonHTMLAttributes, FC } from "react";
 import styled from "styled-components";
 
-interface ButtonStylesProps {
-  padding?: string;
-  width?: string;
-  height?: string;
-}
-
-const ButtonStyles = styled.button<ButtonStylesProps>`
+// Styled component
+const ButtonStyles = styled.button<ButtonProps>`
   background-color: #b6b6b6;
   color: #000;
   border: solid 1px #000;
@@ -31,21 +26,30 @@ const ButtonStyles = styled.button<ButtonStylesProps>`
   }
 `;
 
+// ButtonProps interface extending standard button attributes
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   padding?: string;
   width?: string;
   height?: string;
 }
 
+// Button component
 const Button: FC<ButtonProps> = ({
   children,
   padding,
   width,
   height,
+  onClick,
   ...props
 }) => {
   return (
-    <ButtonStyles padding={padding} width={width} height={height} {...props}>
+    <ButtonStyles
+      onClick={onClick}
+      padding={padding}
+      width={width}
+      height={height}
+      {...props}
+    >
       {children}
     </ButtonStyles>
   );
@@ -53,3 +57,4 @@ const Button: FC<ButtonProps> = ({
 
 export default Button;
 export { Button };
+

@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import Button from "../components/ui/Button";
+import { useEffect, useState } from "react";
+import { useRequestToken } from "../hooks/useToken";
 
 const WelcomeScreenContainer = styled.section`
   display: flex;
@@ -33,11 +35,29 @@ const ButtonsGroup = styled.div`
   display: flex;
   gap: 35px;
 `;
+
 const WelcomeScreen = () => {
+  const [playerName, setPlayerName] = useState("");
+  const { mutate: requestToken, error, isError, isPending } = useRequestToken();
+
+  useEffect(() => {
+    requestToken();
+  }, [requestToken]);
+
+
+
+  if (isPending) return <div>Loading...</div>;
+  if (isError && error) return <div>Error: {error.message}</div>;
+
   return (
     <WelcomeScreenContainer>
       <PlayerBox>
-        <PlayerNameInput type="text" placeholder="player name" />
+        <PlayerNameInput
+          type="text"
+          placeholder="player name"
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+        />
         <ButtonsGroup>
           <Button width="90px" height="75px">
             easy
@@ -50,7 +70,11 @@ const WelcomeScreen = () => {
           </Button>
         </ButtonsGroup>
       </PlayerBox>
-      <Button padding="10px 20px" width="150px">
+      <Button
+        padding="10px 20px"
+        width="150px"
+        disabled={isPending}
+      >
         PLAY
       </Button>
     </WelcomeScreenContainer>

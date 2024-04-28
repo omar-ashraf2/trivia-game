@@ -10,7 +10,8 @@ const fetchCategories = async (): Promise<Category[]> => {
   const response = await axios.get<{ trivia_categories: Category[] }>(
     "https://opentdb.com/api_category.php"
   );
-  return response.data.trivia_categories;
+  const categories = response.data.trivia_categories;
+  return categories;
 };
 
 // Custom hook to use the categories query
