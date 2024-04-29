@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import styled from "styled-components";
 
 interface ShortcutButtonProps {
@@ -21,7 +21,7 @@ const FirstLetter = styled.span`
   height: 25px;
 `;
 
-const ShortcutButton: React.FC<ShortcutButtonProps> = ({ label, ...props }) => {
+const ShortcutButton: FC<ShortcutButtonProps> = ({ label, ...props }) => {
   const firstLetter = label.charAt(0).toUpperCase();
   const restOfLabel = label.slice(1);
 

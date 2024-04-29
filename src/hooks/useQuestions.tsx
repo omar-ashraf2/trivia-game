@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 interface Question {
-  category: string; // Represents the category of the question
-  type: "multiple" | "boolean"; // 'multiple' for multiple choice, 'boolean' for true/false
-  difficulty: "easy" | "medium" | "hard"; // Difficulty level of the question
-  question: string; // The actual trivia question text
-  correct_answer: string; // The correct answer to the question
-  incorrect_answers: string[]; // An array of incorrect answers
+  category: string; 
+  type: "multiple" | "boolean"; 
+  difficulty: "easy" | "medium" | "hard"; 
+  question: string; 
+  correct_answer: string;
+  incorrect_answers: string[];
 }
 
 // Define the function to fetch questions using axios with proper typing

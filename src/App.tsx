@@ -1,22 +1,24 @@
-import { Outlet } from "react-router-dom";
-import Footer from "./components/Footer";
-import { footerItemsWelcomeScreen } from "./constants/footerItems";
-import { useSession } from "./store/SessionContext";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./Layout";
+import { SessionProvider } from "./store/SessionContext";
+import HomePage from "./pages/HomePage";
+import PickCategory from "./pages/PickCategory";
+import GameQuestions from "./pages/GameQuestions";
 
-function App() {
-  const { sessionToken } = useSession();
-
-  if (!sessionToken) {
-    console.log("No session token available.");
-  }
+const App: React.FC = () => {
   return (
-    <>
-      <main>
-        <Outlet />
-      </main>
-      <Footer items={footerItemsWelcomeScreen} />
-    </>
+    <Router>
+      <SessionProvider>
+        <Layout />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/pick-category" element={<PickCategory />} />
+          <Route path="/category/:id" element={<GameQuestions />} />
+        </Routes>
+      </SessionProvider>
+    </Router>
   );
-}
+};
 
 export default App;
