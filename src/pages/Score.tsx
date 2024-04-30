@@ -54,8 +54,13 @@ const NewGameButton = styled(Button)`
 
 const Score = () => {
   const location = useLocation();
-  const { score, skipped, wrong } = location.state || { score: 0, skipped: 0, wrong: 0 };
-  const playerName = localStorage.getItem("playerName") || "Player Name";
+  const { score, skipped, wrong, timeSpent } = location.state || {
+    score: 0,
+    skipped: 0,
+    wrong: 0,
+    timeSpent: 0,
+  };
+  const playerName = localStorage.getItem("playerName") ?? "Player Name";
   const navigate = useNavigate();
 
   const chartOptions = {
@@ -85,6 +90,9 @@ const Score = () => {
     navigate("/pick-category");
   };
 
+  const formattedTimeSpent =
+    timeSpent >= 60 ? `${Math.floor(timeSpent / 60)} min` : `${timeSpent} sec`;
+
   return (
     <ScoreContainer>
       <PlayerName>{playerName}</PlayerName>
@@ -92,7 +100,7 @@ const Score = () => {
         <Box>
           Time
           <TimeSpent>
-            <Time>2</Time> min
+            <Time>{formattedTimeSpent}</Time>
           </TimeSpent>
         </Box>
         <Box>

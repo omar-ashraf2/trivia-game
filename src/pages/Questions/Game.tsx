@@ -47,6 +47,7 @@ const Game: FC = () => {
   const [score, setScore] = useState(0);
   const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
   const [skippedAnswersCount, setSkippedAnswersCount] = useState(0);
+  const [timeSpent, setTimeSpent] = useState(0);
 
   const {
     data: questions,
@@ -62,9 +63,14 @@ const Game: FC = () => {
 
   const navigateToEnd = useCallback(() => {
     navigate("/score", {
-      state: { score, wrong: wrongAnswersCount, skipped: skippedAnswersCount },
+      state: {
+        score,
+        wrong: wrongAnswersCount,
+        skipped: skippedAnswersCount,
+        timeSpent,
+      },
     });
-  }, [navigate, score, wrongAnswersCount, skippedAnswersCount]);
+  }, [navigate, score, wrongAnswersCount, skippedAnswersCount, timeSpent]);
 
   const handleNextQuestion = () => {
     if (!questions) {
@@ -94,6 +100,13 @@ const Game: FC = () => {
     setSkippedAnswersCount(skippedAnswersCount + 1);
     handleNextQuestion();
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeSpent((prevTimeSpent) => prevTimeSpent + 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [timeSpent]);
 
   useEffect(() => {
     if (currentQuestionIndex === questions?.length && questions.length > 0) {
