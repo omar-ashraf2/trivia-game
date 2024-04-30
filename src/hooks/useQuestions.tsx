@@ -10,7 +10,6 @@ interface Question {
   incorrect_answers: string[];
 }
 
-// Define the function to fetch questions using axios with proper typing
 const fetchQuestions = async ({
   category,
   difficulty,
@@ -30,7 +29,6 @@ const fetchQuestions = async ({
   return response.data.results;
 };
 
-// Define TypeScript interfaces for the parameters used in the hook
 interface UseQuestionsParams {
   category?: number;
   difficulty?: string | null;
@@ -38,7 +36,6 @@ interface UseQuestionsParams {
   token?: string | null;
 }
 
-// Create the custom hook to fetch trivia questions
 const useQuestions = ({
   category,
   difficulty,
@@ -48,9 +45,9 @@ const useQuestions = ({
   return useQuery({
     queryKey: ["questions", category, difficulty, amount, token],
     queryFn: () => fetchQuestions({ category, difficulty, amount, token }),
-    enabled: !!token, // Ensures the query runs only if a token is provided
-    staleTime: 60000, // Optional: Override the global staleTime for this specific query if needed
-    retry: 2, // Optional: Override the global retry setting for this specific query if needed
+    enabled: !!token,
+    staleTime: 60000,
+    retry: 2,
   });
 };
 

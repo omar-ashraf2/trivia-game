@@ -4,7 +4,7 @@ import Layout from "./Layout";
 import { SessionProvider } from "./store/SessionContext";
 import HomePage from "./pages/HomePage";
 import PickCategory from "./pages/PickCategory";
-import Game from "./pages/Game";
+import Game from "./pages/Questions/Game";
 
 const App: React.FC = () => {
   return (
