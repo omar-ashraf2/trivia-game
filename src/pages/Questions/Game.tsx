@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import CountdownPie from "../../components/CountdownPie";
@@ -38,16 +38,37 @@ const ButtonsFooter = styled.div`
 
 const Game: FC = () => {
   const { showToast } = useToast();
-  const { sessionToken, difficulty } = useContext(SessionContext);
-  const { id: categoryId } = useParams<{ id: string }>();
+  const { sessionToken, difficulty, gameScores, updateGameScores } =
+    useContext(SessionContext);
+  const { id: categoryId } = useParams<{ id: string | undefined }>();
   const navigate = useNavigate();
-
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
-  const [skippedAnswersCount, setSkippedAnswersCount] = useState(0);
-  const [timeSpent, setTimeSpent] = useState(0);
+  const [score, setScore] = useState(gameScores.score || 0);
+  const [wrongAnswersCount, setWrongAnswersCount] = useState(
+    gameScores.wrong || 0
+  );
+  const [skippedAnswersCount, setSkippedAnswersCount] = useState(
+    gameScores.skipped || 0
+  );
+  const [timeSpent, setTimeSpent] = useState(gameScores.timeSpent || 0);
+
+  const [playedCategories, setPlayedCategories] = useState<number[]>([]);
+
+  useEffect(() => {
+    updateGameScores({
+      score,
+      wrong: wrongAnswersCount,
+      skipped: skippedAnswersCount,
+      timeSpent,
+    });
+  }, [
+    score,
+    wrongAnswersCount,
+    skippedAnswersCount,
+    timeSpent,
+    updateGameScores,
+  ]);
 
   const {
     data: questions,
@@ -58,82 +79,85 @@ const Game: FC = () => {
     category: categoryId ? parseInt(categoryId) : undefined,
     difficulty: difficulty,
     token: sessionToken,
-    amount: 10,
+    amount: 5,
   });
 
-  const navigateToEnd = useCallback(() => {
-    navigate("/score", {
-      state: {
-        score,
-        wrong: wrongAnswersCount,
-        skipped: skippedAnswersCount,
-        timeSpent,
-      },
-    });
-  }, [navigate, score, wrongAnswersCount, skippedAnswersCount, timeSpent]);
+  useEffect(() => {
+    const storedCategories = JSON.parse(
+      localStorage.getItem("playedCategories") ?? "[]"
+    );
+    setPlayedCategories(storedCategories);
+  }, []);
 
-  const handleNextQuestion = () => {
-    if (!questions) {
-      showToast("Please try a different category");
-      return;
+  const navigateToEnd = useCallback(() => {
+    if (playedCategories.length >= 3) {
+      navigate("/score");
+    } else {
+      navigate("/pick-category");
     }
-    const currentQuestion = questions[currentQuestionIndex];
-    if (!currentQuestion) {
-      showToast("Error: No current question available.");
-      return;
-    }
-    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
-    if (isCorrect) {
-      setScore((prevScore) => prevScore + 1);
-    } else if (selectedAnswer) {
-      setWrongAnswersCount((prevCount) => prevCount + 1);
-    }
-    setSelectedAnswer(null);
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+  }, [navigate, playedCategories.length]);
+
+  const handleSkipQuestion = () => {
+    setSkippedAnswersCount(skippedAnswersCount + 1);
+    navigateToNextQuestion();
+  };
+
+  const navigateToNextQuestion = () => {
+    if (questions && currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       navigateToEnd();
     }
   };
 
-  const handleSkipQuestion = () => {
-    setSkippedAnswersCount(skippedAnswersCount + 1);
-    handleNextQuestion();
+  const handleNextQuestion = () => {
+    if (!questions) {
+      showToast("No questions available. Please try a different category.");
+      return;
+    }
+
+    const currentQuestion = questions[currentQuestionIndex];
+    const isCorrect = selectedAnswer === currentQuestion?.correct_answer;
+
+    if (selectedAnswer === null) {
+      showToast("You must choose an answer.");
+      return;
+    }
+
+    if (isCorrect) {
+      setScore(score + 1);
+    } else if (selectedAnswer !== null) {
+      setWrongAnswersCount(wrongAnswersCount + 1);
+    }
+
+    setSelectedAnswer(null);
+    navigateToNextQuestion();
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTimeSpent((prevTimeSpent) => prevTimeSpent + 1);
+      setTimeSpent(timeSpent + 1);
     }, 1000);
     return () => clearTimeout(timer);
   }, [timeSpent]);
 
-  useEffect(() => {
-    if (currentQuestionIndex === questions?.length && questions.length > 0) {
-      navigateToEnd();
-    }
-  }, [currentQuestionIndex, navigateToEnd, questions]);
-
-  const handleAnswerSelection = (answer: string) => setSelectedAnswer(answer);
-
   if (isLoading) return <div>Loading questions...</div>;
   if (isError && error) showToast(`Error: ${error.message}`);
-  if (!questions || questions.length === 0) {
+  if (!questions || questions.length === 0)
     return <div>No questions available. Please try again later.</div>;
-  }
 
   return (
     <QuizContainer>
-      <QuestionText>{questions[currentQuestionIndex].question}</QuestionText>
-      {questions[currentQuestionIndex].type === "multiple" ? (
+      <QuestionText>{questions[currentQuestionIndex]?.question}</QuestionText>
+      {questions[currentQuestionIndex]?.type === "multiple" ? (
         <MCquestion
           question={questions[currentQuestionIndex]}
-          handleAnswerSelection={handleAnswerSelection}
+          handleAnswerSelection={setSelectedAnswer}
           selectedAnswer={selectedAnswer}
         />
       ) : (
         <TFquestion
-          handleAnswerSelection={handleAnswerSelection}
+          handleAnswerSelection={setSelectedAnswer}
           selectedAnswer={selectedAnswer}
         />
       )}

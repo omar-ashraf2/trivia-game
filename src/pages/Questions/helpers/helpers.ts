@@ -5,7 +5,7 @@ export const getTimerValue = (difficulty: string | null): number => {
     case "medium":
       return 60;
     default:
-      return 30;
+      return 90;
   }
 }
 

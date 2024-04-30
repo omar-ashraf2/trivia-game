@@ -1,7 +1,8 @@
+import { useContext, useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../components/ui/Button";
+import { SessionContext } from "../store/SessionContext";
 
 const ScoreContainer = styled.div`
   display: flex;
@@ -53,16 +54,26 @@ const NewGameButton = styled(Button)`
 `;
 
 const Score = () => {
-  const location = useLocation();
-  const { score, skipped, wrong, timeSpent } = location.state || {
+  const { resetSession } = useContext(SessionContext);
+  const [scores, setScores] = useState<{
+    score: number;
+    skipped: number;
+    wrong: number;
+    timeSpent: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const storedScores = JSON.parse(localStorage.getItem("gameScores") ?? "{}");
+    setScores(storedScores);
+  }, []);
+
+  const { score, skipped, wrong, timeSpent } = scores || {
     score: 0,
     skipped: 0,
     wrong: 0,
     timeSpent: 0,
   };
   const playerName = localStorage.getItem("playerName") ?? "Player Name";
-  const navigate = useNavigate();
-
   const chartOptions = {
     labels: ["Correct", "Wrong", "Skipped"],
     colors: ["#82ca9d", "#ff726f", "#ffc658"],
@@ -87,7 +98,7 @@ const Score = () => {
   const chartSeries = [score, wrong, skipped];
 
   const handleNewGame = () => {
-    navigate("/pick-category");
+    resetSession();
   };
 
   const formattedTimeSpent =

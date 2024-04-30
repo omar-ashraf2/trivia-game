@@ -5,75 +5,123 @@ import {
   useEffect,
   useMemo,
   useState,
+  useCallback,
 } from "react";
+import { useNavigate } from "react-router-dom";
 
 type SessionState = {
   sessionToken: string | null;
   playerName: string | null;
   difficulty: string | null;
+  gameScores: GameScores;
   setSessionToken: (token: string | null) => void;
   setPlayerName: (name: string | null) => void;
   setDifficulty: (difficulty: string | null) => void;
+  updateGameScores: (scores: Partial<GameScores>) => void;
   resetSession: () => void;
+};
+
+type GameScores = {
+  score: number;
+  wrong: number;
+  skipped: number;
+  timeSpent: number;
 };
 
 const defaultState: SessionState = {
   sessionToken: null,
   playerName: null,
   difficulty: null,
+  gameScores: {
+    score: 0,
+    wrong: 0,
+    skipped: 0,
+    timeSpent: 0,
+  },
   setSessionToken: () => {},
   setPlayerName: () => {},
   setDifficulty: () => {},
+  updateGameScores: () => {},
   resetSession: () => {},
 };
 
 export const SessionContext = createContext<SessionState>(defaultState);
 
 export const SessionProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [sessionToken, setSessionToken] = useState<string | null>(
-    localStorage.getItem("sessionToken")
-  );
-  const [playerName, setPlayerName] = useState<string | null>(
-    localStorage.getItem("playerName")
-  );
-  const [difficulty, setDifficulty] = useState<string | null>(
-    localStorage.getItem("difficulty")
+  const navigate = useNavigate();
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [playerName, setPlayerName] = useState<string | null>(null);
+  const [difficulty, setDifficulty] = useState<string | null>(null);
+  const [gameScores, setGameScores] = useState<GameScores>(
+    defaultState.gameScores
   );
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("sessionToken", sessionToken ?? "");
-      localStorage.setItem("playerName", playerName ?? "");
-      localStorage.setItem("difficulty", difficulty ?? "");
-    } catch (error) {
-      console.error("Failed to save to localStorage", error);
-    }
-  }, [sessionToken, playerName, difficulty]);
-
-  const resetSession = () => {
-    try {
-      localStorage.removeItem("sessionToken");
-      localStorage.removeItem("playerName");
-      localStorage.removeItem("difficulty");
-    } catch (error) {
-      console.error("Failed to clear localStorage", error);
-    }
+  const resetSession = useCallback(() => {
+    localStorage.clear();
     setSessionToken(null);
     setPlayerName(null);
     setDifficulty(null);
-  };
+    navigate("/");
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("sessionToken");
+    const name = localStorage.getItem("playerName");
+    const diff = localStorage.getItem("difficulty");
+    setSessionToken(token);
+    setPlayerName(name);
+    setDifficulty(diff);
+
+    if (token && name && diff) {
+      const sessionStartTime = localStorage.getItem("sessionStartTime");
+      if (
+        sessionStartTime &&
+        new Date().getTime() - parseInt(sessionStartTime) > 21600000
+      ) {
+        resetSession();
+      }
+    } else {
+      navigate("/");
+    }
+  }, [navigate, resetSession]);
+
+  useEffect(() => {
+    if (sessionToken && playerName && difficulty) {
+      localStorage.setItem("sessionStartTime", String(new Date().getTime()));
+    }
+  }, [sessionToken, playerName, difficulty]);
+
+  useEffect(() => {
+    localStorage.setItem("gameScores", JSON.stringify(gameScores));
+  }, [gameScores]);
+
+  const updateGameScores = useCallback((scores: Partial<GameScores>) => {
+    setGameScores((prevScores) => ({ ...prevScores, ...scores }));
+  }, []);
 
   const value = useMemo(
     () => ({
       sessionToken,
       playerName,
       difficulty,
+      gameScores,
       setSessionToken,
       setPlayerName,
       setDifficulty,
+      updateGameScores,
       resetSession,
     }),
-    [sessionToken, playerName, difficulty]
+    [
+      sessionToken,
+      playerName,
+      difficulty,
+      gameScores,
+      setSessionToken,
+      setPlayerName,
+      setDifficulty,
+      updateGameScores,
+      resetSession,
+    ]
   );
 
   return (

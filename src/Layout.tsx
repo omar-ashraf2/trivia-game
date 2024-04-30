@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Footer from "./components/Footer";
 import Button from "./components/ui/Button";
+import { SessionContext } from "./store/SessionContext";
 import { footerItemsWelcomeScreen } from "./constants/footerItems";
-import { useSession } from "./store/useSession";
+import Footer from "./components/Footer";
 
 const SessionModal = styled.div`
   position: fixed;
@@ -19,6 +19,7 @@ const SessionModal = styled.div`
   top: 50%;
   transform: translate(-50%, -50%);
 `;
+
 const ButtonsModal = styled.div`
   display: flex;
   gap: 20px;
@@ -26,9 +27,20 @@ const ButtonsModal = styled.div`
 `;
 
 const Layout = () => {
-  const { sessionToken, resetSession } = useSession();
+  const { sessionToken, resetSession } = useContext(SessionContext);
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const sessionStartTime = localStorage.getItem("sessionStartTime");
+    if (
+      sessionToken &&
+      sessionStartTime &&
+      new Date().getTime() - parseInt(sessionStartTime) <= 21600000
+    ) {
+      setShowModal(true);
+    }
+  }, [sessionToken]);
 
   const handleContinue = () => {
     navigate("/pick-category");
@@ -37,13 +49,12 @@ const Layout = () => {
 
   const handleReset = () => {
     resetSession();
-    navigate("/");
     setShowModal(false);
   };
 
   return (
     <>
-      {sessionToken && showModal ? (
+      {showModal ? (
         <SessionModal>
           <h2>
             Welcome back! Do you want to continue with your existing session or
