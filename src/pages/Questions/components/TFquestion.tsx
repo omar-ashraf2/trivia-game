@@ -12,9 +12,13 @@ const ButtonsRow = styled.div`
 
 interface TFQProps {
   handleAnswerSelection: (answer: string) => void;
+  selectedAnswer: string | null;
 }
 
-const TFquestion: FC<TFQProps> = ({ handleAnswerSelection }) => {
+const TFquestion: FC<TFQProps> = ({
+  handleAnswerSelection,
+  selectedAnswer,
+}) => {
   const answers = ["True", "False"];
 
   return (
@@ -25,6 +29,7 @@ const TFquestion: FC<TFQProps> = ({ handleAnswerSelection }) => {
           label={answer}
           shortcut={answer[0].toUpperCase()}
           onClick={() => handleAnswerSelection(answer)}
+          $isSelected={selectedAnswer === answer}
         />
       ))}
     </ButtonsRow>

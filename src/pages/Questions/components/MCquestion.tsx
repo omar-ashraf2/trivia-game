@@ -16,11 +16,13 @@ interface MCQProps {
     incorrect_answers: string[];
   };
   handleAnswerSelection: (answer: string) => void;
+  selectedAnswer?: string | null;
 }
 
 const MCquestion: FC<MCQProps> = ({
   question: { correct_answer, incorrect_answers },
   handleAnswerSelection,
+  selectedAnswer,
 }) => {
   const [shuffledAnswers, setShuffledAnswers] = useState<string[]>([]);
 
@@ -50,6 +52,7 @@ const MCquestion: FC<MCQProps> = ({
           label={answer}
           shortcut={answer[0].toUpperCase()}
           onClick={() => handleAnswerSelection(answer)}
+          $isSelected={selectedAnswer === answer}
         />
       ))}
     </ButtonsRow>

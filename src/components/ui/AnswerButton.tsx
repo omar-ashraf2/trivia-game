@@ -1,17 +1,24 @@
-import { ButtonHTMLAttributes } from "react";
+import React, { ButtonHTMLAttributes } from "react";
 import styled from "styled-components";
 import Button from "./Button";
 
 interface AnswerButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   shortcut: string;
   label: string;
-  onClick?: () => void;
+  $isSelected?: boolean;
 }
 
-const ButtonContainer = styled(Button)`
+const ButtonContainer = styled(Button)<{ $isSelected?: boolean }>`
   padding: 24px 60px;
   position: relative;
   font-size: 28px;
+  background-color: ${({ $isSelected }) =>
+    $isSelected ? "#0c8e0c" : "lightgrey"};
+  color: ${({ $isSelected }) => ($isSelected ? "white" : "black")};
+  &:hover {
+    background-color: ${({ $isSelected }) =>
+      $isSelected ? "#169f16dc" : "#65626285"};
+  }
 `;
 
 const ShortcutBox = styled.span`
@@ -32,9 +39,11 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
   shortcut,
   label,
   onClick,
+  $isSelected,
+  ...props
 }) => {
   return (
-    <ButtonContainer onClick={onClick}>
+    <ButtonContainer onClick={onClick} $isSelected={$isSelected} {...props}>
       <ShortcutBox>{shortcut}</ShortcutBox>
       <Label>{label}</Label>
     </ButtonContainer>

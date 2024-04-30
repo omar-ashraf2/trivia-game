@@ -5,6 +5,7 @@ import { SessionProvider } from "./store/SessionContext";
 import HomePage from "./pages/HomePage";
 import PickCategory from "./pages/PickCategory";
 import Game from "./pages/Questions/Game";
+import Score from "./pages/Score";
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
             <Route index element={<HomePage />} />
             <Route path="pick-category" element={<PickCategory />} />
             <Route path="category/:id" element={<Game />} />
+            <Route path="/score" element={<Score />} />
           </Route>
         </Routes>
       </SessionProvider>
