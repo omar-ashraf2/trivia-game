@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import CountdownPie from "../../components/CountdownPie";
@@ -40,12 +40,13 @@ const Game: FC = () => {
   const { showToast } = useToast();
   const { sessionToken, difficulty } = useContext(SessionContext);
   const { id: categoryId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
-
-  const navigate = useNavigate();
+  const [skippedAnswersCount, setSkippedAnswersCount] = useState(0);
 
   const {
     data: questions,
@@ -59,54 +60,53 @@ const Game: FC = () => {
     amount: 10,
   });
 
+  const navigateToEnd = useCallback(() => {
+    navigate("/score", {
+      state: { score, wrong: wrongAnswersCount, skipped: skippedAnswersCount },
+    });
+  }, [navigate, score, wrongAnswersCount, skippedAnswersCount]);
+
   const handleNextQuestion = () => {
-    if (
-      questions &&
-      selectedAnswer &&
-      selectedAnswer === questions[currentQuestionIndex].correct_answer
-    ) {
-      setScore((score) => score + 1);
-    } else {
-      setWrongAnswersCount((count) => count + 1);
+    if (!questions) {
+      showToast("Please try a different category");
+      return;
+    }
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) {
+      showToast("Error: No current question available.");
+      return;
+    }
+    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
+    if (isCorrect) {
+      setScore((prevScore) => prevScore + 1);
+    } else if (selectedAnswer) {
+      setWrongAnswersCount((prevCount) => prevCount + 1);
     }
     setSelectedAnswer(null);
-    if (questions && currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((index) => index + 1);
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    } else {
+      navigateToEnd();
     }
   };
 
   const handleSkipQuestion = () => {
-    setSelectedAnswer(null);
-    if (questions && currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((index) => index + 1);
-    }
-  };
-
-  const handleAnswerSelection = (answer: string) => {
-    setSelectedAnswer(answer);
+    setSkippedAnswersCount(skippedAnswersCount + 1);
+    handleNextQuestion();
   };
 
   useEffect(() => {
-    if (score + wrongAnswersCount === 10) {
-      navigate("/score", { state: { score } });
+    if (currentQuestionIndex === questions?.length && questions.length > 0) {
+      navigateToEnd();
     }
-  }, [score, wrongAnswersCount, navigate]);
+  }, [currentQuestionIndex, navigateToEnd, questions]);
 
-  if (isLoading) {
-    return <div>Loading questions...</div>;
-  }
+  const handleAnswerSelection = (answer: string) => setSelectedAnswer(answer);
 
-  if (isError && error) {
-    showToast(`Error: ${error.message}`);
-  }
-
+  if (isLoading) return <div>Loading questions...</div>;
+  if (isError && error) showToast(`Error: ${error.message}`);
   if (!questions || questions.length === 0) {
-    return (
-      <div style={{ textAlign: "center" }}>
-        No questions available. <br /> Please select another category or try
-        again later.
-      </div>
-    );
+    return <div>No questions available. Please try again later.</div>;
   }
 
   return (
@@ -127,11 +127,15 @@ const Game: FC = () => {
       <CountdownPie
         key={currentQuestionIndex}
         initialSeconds={getTimerValue(difficulty)}
-        onExpire={handleNextQuestion}
+        onExpire={handleSkipQuestion}
       />
       <ButtonsFooter>
-        <Button $padding="10px 50px" onClick={handleSkipQuestion}>Skip</Button>
-        <Button $padding="10px 50px" onClick={handleNextQuestion}>Next</Button>
+        <Button $padding="10px 50px" onClick={handleSkipQuestion}>
+          Skip
+        </Button>
+        <Button $padding="10px 50px" onClick={handleNextQuestion}>
+          Next
+        </Button>
       </ButtonsFooter>
     </QuizContainer>
   );
