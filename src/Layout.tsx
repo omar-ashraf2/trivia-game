@@ -42,7 +42,7 @@ const Layout = () => {
   };
 
   return (
-    <div>
+    <>
       {sessionToken && showModal ? (
         <SessionModal>
           <h2>
@@ -61,7 +61,7 @@ const Layout = () => {
           <Footer items={footerItemsWelcomeScreen} />
         </>
       )}
-    </div>
+    </>
   );
 };
 

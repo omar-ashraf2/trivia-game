@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 interface Question {
-  category: string; 
-  type: "multiple" | "boolean"; 
-  difficulty: "easy" | "medium" | "hard"; 
-  question: string; 
+  category: string;
+  type: "multiple" | "boolean";
+  difficulty: "easy" | "medium" | "hard" | null;
+  question: string;
   correct_answer: string;
   incorrect_answers: string[];
 }
@@ -33,9 +33,9 @@ const fetchQuestions = async ({
 // Define TypeScript interfaces for the parameters used in the hook
 interface UseQuestionsParams {
   category?: number;
-  difficulty?: "easy" | "medium" | "hard";
+  difficulty?: string | null;
   amount?: number;
-  token?: string;
+  token?: string | null;
 }
 
 // Create the custom hook to fetch trivia questions

@@ -20,7 +20,6 @@ export const useRequestToken = () => {
     mutationFn: requestNewToken,
     onSuccess: (data) => {
       queryClient.setQueryData(["token"], data.token);
-      console.log(data);
     },
   });
 };
@@ -40,7 +39,6 @@ export const useResetToken = () => {
     mutationFn: (token) => resetToken(token),
     onSuccess: (data) => {
       queryClient.setQueryData(["token"], data.token);
-      console.log(data);
     },
   });
 };

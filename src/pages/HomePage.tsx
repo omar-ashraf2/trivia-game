@@ -82,6 +82,7 @@ const HomePage = () => {
         localStorage.setItem("sessionToken", data.token);
         localStorage.setItem("playerName", playerName);
         localStorage.setItem("difficulty", difficulty);
+        console.log(localStorage);
         navigate("/pick-category");
       },
       onError: () => {

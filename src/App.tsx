@@ -4,17 +4,18 @@ import Layout from "./Layout";
 import { SessionProvider } from "./store/SessionContext";
 import HomePage from "./pages/HomePage";
 import PickCategory from "./pages/PickCategory";
-import GameQuestions from "./pages/GameQuestions";
+import Game from "./pages/Game";
 
 const App: React.FC = () => {
   return (
     <Router>
       <SessionProvider>
-        <Layout />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/pick-category" element={<PickCategory />} />
-          <Route path="/category/:id" element={<GameQuestions />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="pick-category" element={<PickCategory />} />
+            <Route path="category/:id" element={<Game />} />
+          </Route>
         </Routes>
       </SessionProvider>
     </Router>
