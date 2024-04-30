@@ -11,7 +11,7 @@ interface AnswerButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const ButtonContainer = styled(Button)<{ $isSelected?: boolean }>`
   padding: 24px 60px;
   position: relative;
-  font-size: 28px;
+  font-size: 20px;
   background-color: ${({ $isSelected }) =>
     $isSelected ? "#0c8e0c" : "lightgrey"};
   color: ${({ $isSelected }) => ($isSelected ? "white" : "black")};

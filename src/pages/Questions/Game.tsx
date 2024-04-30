@@ -1,14 +1,14 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import CountdownPie from "../../components/CountdownPie";
 import Button from "../../components/ui/Button";
 import { useQuestions } from "../../hooks/useQuestions";
 import { SessionContext } from "../../store/SessionContext";
 import { useToast } from "../../store/useToast";
 import MCquestion from "./components/MCquestion";
 import TFquestion from "./components/TFquestion";
-import { calculateScore, getTimerValue } from "./helpers/helpers";
-import CountdownPie from "../../components/CountdownPie";
+import { getTimerValue } from "./helpers/helpers";
 
 const QuizContainer = styled.section`
   display: flex;
@@ -43,6 +43,8 @@ const Game: FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
+  const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
+
   const navigate = useNavigate();
 
   const {
@@ -60,15 +62,16 @@ const Game: FC = () => {
   const handleNextQuestion = () => {
     if (
       questions &&
+      selectedAnswer &&
       selectedAnswer === questions[currentQuestionIndex].correct_answer
     ) {
-      setScore((score) => calculateScore(score, true));
+      setScore((score) => score + 1);
+    } else {
+      setWrongAnswersCount((count) => count + 1);
     }
     setSelectedAnswer(null);
     if (questions && currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((index) => index + 1);
-    } else {
-      navigate("/score", { state: { score } });
     }
   };
 
@@ -76,14 +79,18 @@ const Game: FC = () => {
     setSelectedAnswer(null);
     if (questions && currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((index) => index + 1);
-    } else {
-      navigate("/score", { state: { score } });
     }
   };
 
   const handleAnswerSelection = (answer: string) => {
     setSelectedAnswer(answer);
   };
+
+  useEffect(() => {
+    if (score + wrongAnswersCount === 10) {
+      navigate("/score", { state: { score } });
+    }
+  }, [score, wrongAnswersCount, navigate]);
 
   if (isLoading) {
     return <div>Loading questions...</div>;
@@ -94,7 +101,12 @@ const Game: FC = () => {
   }
 
   if (!questions || questions.length === 0) {
-    return <div>No questions available. Please try again later.</div>;
+    return (
+      <div style={{ textAlign: "center" }}>
+        No questions available. <br /> Please select another category or try
+        again later.
+      </div>
+    );
   }
 
   return (
@@ -118,8 +130,8 @@ const Game: FC = () => {
         onExpire={handleNextQuestion}
       />
       <ButtonsFooter>
-        <Button onClick={handleSkipQuestion}>Skip</Button>
-        <Button onClick={handleNextQuestion}>Next</Button>
+        <Button $padding="10px 50px" onClick={handleSkipQuestion}>Skip</Button>
+        <Button $padding="10px 50px" onClick={handleNextQuestion}>Next</Button>
       </ButtonsFooter>
     </QuizContainer>
   );

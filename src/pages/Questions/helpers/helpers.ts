@@ -9,6 +9,3 @@ export const getTimerValue = (difficulty: string | null): number => {
   }
 }
 
-export const calculateScore = (currentScore: number, increment: boolean): number => {
-  return increment ? currentScore + 1 : currentScore;
-};
