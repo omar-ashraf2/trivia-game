@@ -14,7 +14,6 @@ const fetchCategories = async (): Promise<Category[]> => {
   return categories;
 };
 
-// Custom hook to use the categories query
 export const useCategories = () => {
   return useQuery({
     queryKey: ["categories"],

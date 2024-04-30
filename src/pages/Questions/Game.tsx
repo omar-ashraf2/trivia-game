@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState, useCallback } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import CountdownPie from "../../components/CountdownPie";

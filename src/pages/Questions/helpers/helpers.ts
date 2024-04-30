@@ -7,5 +7,4 @@ export const getTimerValue = (difficulty: string | null): number => {
     default:
       return 90;
   }
-}
-
+};
