@@ -9,6 +9,8 @@ import { useToast } from "../../store/useToast";
 import MCquestion from "./components/MCquestion";
 import TFquestion from "./components/TFquestion";
 import { getTimerValue } from "./helpers/helpers";
+import Footer from "../../components/Footer";
+import { footerItemsMCQ, footerItemsTFQ } from "../../constants/footerItems";
 
 const QuizContainer = styled.section`
   display: flex;
@@ -150,16 +152,22 @@ const Game: FC = () => {
     <QuizContainer>
       <QuestionText>{questions[currentQuestionIndex]?.question}</QuestionText>
       {questions[currentQuestionIndex]?.type === "multiple" ? (
-        <MCquestion
-          question={questions[currentQuestionIndex]}
-          handleAnswerSelection={setSelectedAnswer}
-          selectedAnswer={selectedAnswer}
-        />
+        <>
+          <MCquestion
+            question={questions[currentQuestionIndex]}
+            handleAnswerSelection={setSelectedAnswer}
+            selectedAnswer={selectedAnswer}
+          />
+          <Footer items={footerItemsMCQ} />
+        </>
       ) : (
-        <TFquestion
-          handleAnswerSelection={setSelectedAnswer}
-          selectedAnswer={selectedAnswer}
-        />
+        <>
+          <TFquestion
+            handleAnswerSelection={setSelectedAnswer}
+            selectedAnswer={selectedAnswer}
+          />
+          <Footer items={footerItemsTFQ} />
+        </>
       )}
       <CountdownPie
         key={currentQuestionIndex}

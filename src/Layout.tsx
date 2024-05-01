@@ -1,10 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Button from "./components/ui/Button";
 import { SessionContext } from "./store/SessionContext";
-import { footerItemsWelcomeScreen } from "./constants/footerItems";
-import Footer from "./components/Footer";
 
 const SessionModal = styled.div`
   position: fixed;
@@ -67,10 +65,7 @@ const Layout = () => {
           </ButtonsModal>
         </SessionModal>
       ) : (
-        <>
-          <Outlet />
-          <Footer items={footerItemsWelcomeScreen} />
-        </>
+        <Outlet />
       )}
     </>
   );

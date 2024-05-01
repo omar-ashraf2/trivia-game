@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Footer from "../components/Footer";
 import Button from "../components/ui/Button";
+import { footerItemsWelcomeScreen } from "../constants/footerItems";
 import { useRequestToken } from "../hooks/useToken";
 import { useToast } from "../store/useToast";
 
@@ -55,26 +57,11 @@ const HomePage = () => {
   const [playerName, setPlayerName] = useState("");
   const { mutate: requestToken, isError, isPending } = useRequestToken();
   const [difficulty, setDifficulty] = useState<string>("");
-
   const { showToast } = useToast();
 
-  if (isPending) {
-    return <div>Loading...</div>;
-  }
-  if (isError) {
-    return <div>Error: Token request failed!</div>;
-  }
-
-  const handlePlayClick = async (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-    if (!playerName) {
-      showToast("Please enter your name.");
-      return;
-    }
-    if (!difficulty) {
-      showToast("Please select a difficulty level.");
+  const handlePlayClick = useCallback(() => {
+    if (!playerName || !difficulty) {
+      showToast("Please enter your name and select a difficulty level.");
       return;
     }
     requestToken(undefined, {
@@ -88,39 +75,75 @@ const HomePage = () => {
         showToast("Error requesting token.");
       },
     });
-  };
+  }, [navigate, playerName, difficulty, requestToken, showToast]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key.toUpperCase()) {
+        case "E":
+          setDifficulty("easy");
+          break;
+        case "M":
+          setDifficulty("medium");
+          break;
+        case "H":
+          setDifficulty("hard");
+          break;
+        case "P":
+          handlePlayClick();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handlePlayClick]);
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+  if (isError) {
+    return <div>Error: Token request failed!</div>;
+  }
 
   return (
-    <HomePageContainer>
-      <PlayerBox>
-        <PlayerNameInput
-          type="text"
-          placeholder="Player name"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-        />
-        <ButtonsGroup>
-          {["easy", "medium", "hard"].map((level) => (
-            <DifficultyButton
-              key={level}
-              $padding="35px 15px"
-              selected={difficulty === level}
-              onClick={() => setDifficulty(level)}
-            >
-              {level}
-            </DifficultyButton>
-          ))}
-        </ButtonsGroup>
-      </PlayerBox>
-      <Button
-        onClick={handlePlayClick}
-        $padding="10px 20px"
-        $width="150px"
-        disabled={isPending || !playerName || !difficulty}
-      >
-        PLAY
-      </Button>
-    </HomePageContainer>
+    <>
+      <HomePageContainer>
+        <PlayerBox>
+          <PlayerNameInput
+            type="text"
+            placeholder="Player name"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+          />
+          <ButtonsGroup>
+            {["easy", "medium", "hard"].map((level) => (
+              <DifficultyButton
+                key={level}
+                $padding="35px 15px"
+                selected={difficulty === level}
+                onClick={() => setDifficulty(level)}
+              >
+                {level}
+              </DifficultyButton>
+            ))}
+          </ButtonsGroup>
+        </PlayerBox>
+        <Button
+          onClick={handlePlayClick}
+          $padding="10px 20px"
+          $width="150px"
+          disabled={isPending || !playerName || !difficulty}
+        >
+          PLAY
+        </Button>
+      </HomePageContainer>
+      <Footer items={footerItemsWelcomeScreen} />
+    </>
   );
 };
 

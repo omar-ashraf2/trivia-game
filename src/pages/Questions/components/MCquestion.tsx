@@ -46,11 +46,11 @@ const MCquestion: FC<MCQProps> = ({
 
   return (
     <ButtonsRow>
-      {shuffledAnswers.map((answer) => (
+      {shuffledAnswers.map((answer, index) => (
         <AnswerButton
           key={answer}
           label={answer}
-          shortcut={answer[0].toUpperCase()}
+          shortcut={`${index + 1}`}
           onClick={() => handleAnswerSelection(answer)}
           $isSelected={selectedAnswer === answer}
         />

@@ -19,6 +19,7 @@ const FirstLetter = styled.span`
   justify-content: center;
   width: 25px;
   height: 25px;
+  font-size: 24px;
 `;
 
 const ShortcutButton: FC<ShortcutButtonProps> = ({ label, ...props }) => {

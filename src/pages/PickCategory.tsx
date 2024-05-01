@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../components/ui/Button";
 import { useCategories } from "../hooks/useCategories";
 import { useToast } from "../store/useToast";
+import Footer from "../components/Footer";
+import { footerItemsPickCategory } from "../constants/footerItems";
 
 const QuestionCategoryContainer = styled.section`
   width: 100%;
@@ -56,11 +58,7 @@ const PickCategory = () => {
     setPlayedCategories(storedCategories);
   }, []);
 
-  const handleCategorySelect = (categoryId: number) => {
-    setSelectedCategory(categoryId);
-  };
-
-  const handleStartClick = () => {
+  const handleStartClick = useCallback(() => {
     if (selectedCategory !== null) {
       const updatedPlayedCategories = [...playedCategories, selectedCategory];
       localStorage.setItem(
@@ -72,6 +70,22 @@ const PickCategory = () => {
     } else {
       showToast("Please select a category to start.");
     }
+  }, [navigate, selectedCategory, playedCategories, showToast]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toUpperCase() === "S") {
+        handleStartClick();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleStartClick]);
+
+  const handleCategorySelect = (categoryId: number) => {
+    setSelectedCategory(categoryId);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -81,24 +95,27 @@ const PickCategory = () => {
   }
 
   return (
-    <QuestionCategoryContainer>
-      <Header>Questions Category</Header>
-      <CategoryList>
-        {categories?.map((category) => (
-          <CategoryItem
-            key={category.id}
-            selected={category.id === selectedCategory}
-            disabled={playedCategories.includes(category.id)}
-            onClick={() => handleCategorySelect(category.id)}
-          >
-            {category.name}
-          </CategoryItem>
-        ))}
-      </CategoryList>
-      <Button $width="160px" onClick={handleStartClick}>
-        START
-      </Button>
-    </QuestionCategoryContainer>
+    <>
+      <QuestionCategoryContainer>
+        <Header>Questions Category</Header>
+        <CategoryList>
+          {categories?.map((category) => (
+            <CategoryItem
+              key={category.id}
+              selected={category.id === selectedCategory}
+              disabled={playedCategories.includes(category.id)}
+              onClick={() => handleCategorySelect(category.id)}
+            >
+              {category.name}
+            </CategoryItem>
+          ))}
+        </CategoryList>
+        <Button $width="160px" onClick={handleStartClick}>
+          START
+        </Button>
+      </QuestionCategoryContainer>
+      <Footer items={footerItemsPickCategory} />
+    </>
   );
 };
 
